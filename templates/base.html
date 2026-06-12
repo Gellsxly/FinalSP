@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistem Pakar Certainty Factor{% endblock %}</title>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Flash Messages -->
+    <div class="alert-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" id="alert-{{ loop.index }}">
+                        {% if category == 'success' %}
+                            <i class="fa-solid fa-circle-check"></i>
+                        {% else %}
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                    <script>
+                        setTimeout(() => {
+                            const alertEl = document.getElementById('alert-{{ loop.index }}');
+                            if (alertEl) {
+                                alertEl.style.opacity = '0';
+                                alertEl.style.transform = 'translateX(100px)';
+                                alertEl.style.transition = 'all 0.5s ease';
+                                setTimeout(() => alertEl.remove(), 500);
+                            }
+                        }, 4000);
+                    </script>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container navbar">
+            <a href="{{ url_for('index') }}" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <span>MindCare CF</span>
+            </a>
+            <ul class="nav-links">
+                <li>
+                    <a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                        <i class="fa-solid fa-house"></i> Beranda
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('rules') }}" class="nav-link {% if request.path == '/rules' %}active{% endif %}">
+                        <i class="fa-solid fa-book-medical"></i> Rule Base
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('history') }}" class="nav-link {% if request.path == '/history' %}active{% endif %}">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Riwayat
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('diagnose') }}" class="btn btn-primary nav-btn">
+                        <i class="fa-solid fa-stethoscope"></i> Mulai Diagnosa
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main style="flex-grow: 1;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="footer-logo">
+                <i class="fa-solid fa-brain" style="color: var(--primary);"></i> MindCare CF
+            </a>
+            <p style="margin-bottom: 0.5rem;">Sistem Pakar Mendiagnosa Gangguan Mental pada Diri Seseorang Menggunakan Metode Certainty Factor</p>
+            <p>&copy; 2026. Dibuat dengan <i class="fa-solid fa-heart" style="color: var(--secondary);"></i> untuk Kesehatan Mental yang Lebih Baik.</p>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

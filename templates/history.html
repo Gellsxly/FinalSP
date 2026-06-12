@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Riwayat Diagnosis | MindCare CF{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+    
+    <!-- History Header -->
+    <div class="history-header">
+        <div>
+            <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.25rem;">Riwayat Diagnosa</h1>
+            <p style="color: var(--text-secondary);">
+                Daftar diagnosa kesehatan mental yang telah disimpan di sistem ini.
+            </p>
+        </div>
+        
+        {% if history %}
+        <div>
+            <form action="{{ url_for('clear_history') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus semua riwayat diagnosa? Tindakan ini tidak dapat dibatalkan.');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash-can"></i> Bersihkan Semua Riwayat
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- History Table or Empty State -->
+    {% if history %}
+    <div class="card" style="padding: 1.5rem;">
+        <div class="table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px; text-align: center;">No.</th>
+                        <th>Nama Pasien</th>
+                        <th>Tanggal Diagnosa</th>
+                        <th>Hasil Diagnosa Utama</th>
+                        <th style="text-align: center;">Nilai CF</th>
+                        <th style="text-align: center;">Keyakinan</th>
+                        <th style="width: 240px; text-align: right;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td style="text-align: center; font-weight: 600; color: var(--text-muted);">{{ loop.index }}</td>
+                        <td style="font-weight: 700; color: #fff;">{{ item.nama }}</td>
+                        <td>{{ item.tanggal }}</td>
+                        <td>
+                            <span style="font-weight: 600; color: var(--secondary);">{{ item.hasil_penyakit }}</span>
+                        </td>
+                        <td style="text-align: center; font-family: monospace;">{{ item.hasil_cf }}</td>
+                        <td style="text-align: center;">
+                            {% set pct = item.hasil_cf * 100 %}
+                            {% if pct >= 70 %}
+                                <span class="cf-badge cf-high">{{ pct | round(1) }}%</span>
+                            {% elif pct >= 40 %}
+                                <span class="cf-badge cf-medium">{{ pct | round(1) }}%</span>
+                            {% else %}
+                                <span class="cf-badge cf-low">{{ pct | round(1) }}%</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                                <a href="{{ url_for('result', result_id=item.id) }}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-eye"></i> Detail
+                                </a>
+                                <form action="{{ url_for('delete_history', result_id=item.id) }}" method="POST" onsubmit="return confirm('Hapus riwayat diagnosa ini?');" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background: #3b141a; border: 1px solid #7c2d12; color: #f87171;">
+                                        <i class="fa-solid fa-trash"></i> Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State Layout -->
+    <div class="card" style="text-align: center; padding: 5rem 2rem;">
+        <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Belum Ada Riwayat</h3>
+        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem auto;">
+            Anda belum melakukan konsultasi atau riwayat telah dibersihkan. Mulailah diagnosa mandiri untuk melihat hasil di sini.
+        </p>
+        <a href="{{ url_for('diagnose') }}" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-stethoscope"></i> Mulai Diagnosa Sekarang
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

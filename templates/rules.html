@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Basis Aturan Pakar | MindCare CF{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+    <!-- Rules Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">Basis Aturan Pakar (Rule Base)</h1>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+            Transparansi data relasi antara gejala klinis dengan masing-masing diagnosis gangguan mental beserta bobot Certainty Factor Pakar (CF Expert).
+        </p>
+    </div>
+
+    <!-- Rule Table Card -->
+    <div class="card" style="padding: 2rem;">
+        <div style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 700;">Tabel Hubungan Gejala & Gangguan</h3>
+            <span style="font-size: 0.85rem; color: var(--text-secondary); background: rgba(255,255,255,0.05); padding: 0.4rem 0.8rem; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                <i class="fa-solid fa-calculator" style="color: var(--primary);"></i> Nilai Rentang CF Pakar: 0.4 s/d 0.8
+            </span>
+        </div>
+
+        <div class="table-container">
+            <table class="custom-table" style="font-size: 0.9rem;">
+                <thead>
+                    <tr>
+                        <th style="width: 80px; text-align: center;">Kode</th>
+                        <th>Gejala Gangguan Mental</th>
+                        <th style="text-align: center; width: 110px;">Skizofrenia</th>
+                        <th style="text-align: center; width: 110px;">OCD</th>
+                        <th style="text-align: center; width: 110px;">Anorexia</th>
+                        <th style="text-align: center; width: 110px;">Depresi</th>
+                        <th style="text-align: center; width: 120px;">Self Injuries</th>
+                        <th style="text-align: center; width: 120px;">Homoseksual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g_code, g_desc in gejala.items() %}
+                    <tr>
+                        <td style="text-align: center;">
+                            <span class="symptom-code">{{ g_code }}</span>
+                        </td>
+                        <td style="font-weight: 500; color: #fff;">{{ g_desc }}</td>
+                        
+                        <!-- Skizofrenia (MB1) -->
+                        <td style="text-align: center;">
+                            {% if cf_expert['MB1'][g_code] is defined %}
+                                <span class="cf-badge" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; font-weight: 700;">
+                                    {{ cf_expert['MB1'][g_code] }}
+                                </span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- OCD (MB2) -->
+                        <td style="text-align: center;">
+                            {% if cf_expert['MB2'][g_code] is defined %}
+                                <span class="cf-badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; font-weight: 700;">
+                                    {{ cf_expert['MB2'][g_code] }}
+                                </span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Anorexia (MB3) -->
+                        <td style="text-align: center;">
+                            {% if cf_expert['MB3'][g_code] is defined %}
+                                <span class="cf-badge" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; font-weight: 700;">
+                                    {{ cf_expert['MB3'][g_code] }}
+                                </span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Depresi (MB4) -->
+                        <td style="text-align: center;">
+                            {% if cf_expert['MB4'][g_code] is defined %}
+                                <span class="cf-badge" style="background: rgba(244, 63, 94, 0.15); color: #fb7185; font-weight: 700;">
+                                    {{ cf_expert['MB4'][g_code] }}
+                                </span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Self Injuries (MB5) -->
+                        <td style="text-align: center;">
+                            {% if cf_expert['MB5'][g_code] is defined %}
+                                <span class="cf-badge" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-weight: 700;">
+                                    {{ cf_expert['MB5'][g_code] }}
+                                </span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- Homoseksual (MB6) -->
+                        <td style="text-align: center;">
+                            {% if cf_expert['MB6'][g_code] is defined %}
+                                <span class="cf-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 700;">
+                                    {{ cf_expert['MB6'][g_code] }}
+                                </span>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

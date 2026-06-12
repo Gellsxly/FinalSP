@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Konsultasi Diagnosa | MindCare CF{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+    <!-- Form Header -->
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">Konsultasi Gangguan Mental</h1>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+            Pilihlah tingkat keyakinan Anda secara jujur untuk setiap gejala di bawah ini berdasarkan kondisi yang Anda rasakan selama beberapa waktu terakhir.
+        </p>
+    </div>
+
+    <!-- Diagnostic Form Card -->
+    <div class="card" style="padding: 2.5rem;">
+        <form action="{{ url_for('diagnose') }}" method="POST">
+            <!-- User Info Section -->
+            <div class="form-group" style="max-width: 400px; margin-bottom: 2.5rem;">
+                <label for="nama" class="form-label">
+                    <i class="fa-solid fa-user" style="color: var(--primary); margin-right: 0.5rem;"></i> Nama Lengkap / Inisial
+                </label>
+                <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama Anda (misal: Budi / Anonim)" required>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">
+                    Identitas Anda dienkripsi secara lokal dan hanya digunakan untuk pencatatan riwayat konsultasi.
+                </p>
+            </div>
+
+            <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 1.25rem; font-weight: 700;">Daftar Gejala (30 Gejala)</h3>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);"><i class="fa-solid fa-circle-info"></i> Silakan pilih tingkat keyakinan</span>
+            </div>
+
+            <!-- List of Symptoms -->
+            <div class="symptom-list-container">
+                {% for key, value in gejala.items() %}
+                <div class="symptom-row" id="row-{{ key }}">
+                    <!-- Symptom Code -->
+                    <div>
+                        <span class="symptom-code">{{ key }}</span>
+                    </div>
+                    <!-- Symptom Description -->
+                    <div class="symptom-text">
+                        {{ value }}
+                    </div>
+                    <!-- Certainty Input Dropdown -->
+                    <div class="symptom-select">
+                        <select name="{{ key }}" class="form-control symptom-select-dropdown" onchange="updateRowColor('{{ key }}', this.value)">
+                            {% for option_name, option_val in pilihan.items() %}
+                                <option value="{{ option_name }}">{{ option_name }} (CF: {{ option_val }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 3rem; display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                <button type="reset" class="btn btn-secondary" onclick="resetAllRows()">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Reset Form
+                </button>
+                <button type="submit" class="btn btn-primary btn-lg" style="padding-left: 2.5rem; padding-right: 2.5rem;">
+                    <i class="fa-solid fa-calculator"></i> Proses Diagnosis
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Map options to colors/opacity levels for interactive visuals
+    const optionStyles = {
+        'Tidak Pasti': { background: 'rgba(255, 255, 255, 0.02)', borderColor: 'var(--border-color)', glow: 'none' },
+        'Kurang Yakin': { background: 'rgba(99, 102, 241, 0.03)', borderColor: 'rgba(99, 102, 241, 0.2)', glow: 'none' },
+        'Cukup Yakin': { background: 'rgba(99, 102, 241, 0.05)', borderColor: 'rgba(99, 102, 241, 0.3)', glow: 'none' },
+        'Yakin': { background: 'rgba(168, 85, 247, 0.08)', borderColor: 'rgba(168, 85, 247, 0.4)', glow: '0 0 10px rgba(168, 85, 247, 0.1)' },
+        'Sangat Yakin': { background: 'rgba(236, 72, 153, 0.1)', borderColor: 'rgba(236, 72, 153, 0.5)', glow: '0 0 15px rgba(236, 72, 153, 0.15)' },
+        'Pasti': { background: 'rgba(236, 72, 153, 0.15)', borderColor: 'rgba(244, 63, 94, 0.6)', glow: '0 0 20px rgba(244, 63, 94, 0.25)' }
+    };
+
+    function updateRowColor(key, value) {
+        const row = document.getElementById(`row-${key}`);
+        if (!row) return;
+
+        const style = optionStyles[value] || optionStyles['Tidak Pasti'];
+        row.style.background = style.background;
+        row.style.borderColor = style.borderColor;
+        row.style.boxShadow = style.glow;
+        
+        // Add a class for non-zero selections to highlight active symptoms
+        if (value !== 'Tidak Pasti') {
+            row.classList.add('symptom-active');
+            row.querySelector('.symptom-code').style.background = 'var(--primary-gradient)';
+            row.querySelector('.symptom-code').style.color = '#fff';
+        } else {
+            row.classList.remove('symptom-active');
+            row.querySelector('.symptom-code').style.background = 'rgba(99, 102, 241, 0.1)';
+            row.querySelector('.symptom-code').style.color = '#a5b4fc';
+        }
+    }
+
+    function resetAllRows() {
+        const rows = document.querySelectorAll('.symptom-row');
+        rows.forEach(row => {
+            row.style.background = 'rgba(255, 255, 255, 0.02)';
+            row.style.borderColor = 'var(--border-color)';
+            row.style.boxShadow = 'none';
+            
+            const codeEl = row.querySelector('.symptom-code');
+            codeEl.style.background = 'rgba(99, 102, 241, 0.1)';
+            codeEl.style.color = '#a5b4fc';
+        });
+    }
+</script>
+{% endblock %}

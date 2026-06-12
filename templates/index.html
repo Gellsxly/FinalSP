@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Beranda | MindCare CF - Sistem Pakar Gangguan Mental{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge">
+            <i class="fa-solid fa-shield-halved"></i> Privasi Terjaga & Aman 100%
+        </div>
+        <h1 class="hero-title">
+            Deteksi Dini Kesehatan Mental Anda <br>dengan <span>Certainty Factor</span>
+        </h1>
+        <p class="hero-desc">
+            Evaluasi kondisi psikologis Anda secara mandiri menggunakan kecerdasan buatan sistem pakar. Dapatkan analisis tingkat kepastian (Certainty Factor) untuk 6 jenis kondisi mental berdasarkan 30 gejala medis yang umum terjadi.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('diagnose') }}" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-stethoscope"></i> Mulai Konsultasi
+            </a>
+            <a href="{{ url_for('rules') }}" class="btn btn-secondary btn-lg">
+                <i class="fa-solid fa-list-check"></i> Basis Aturan Pakar
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Info Gangguan Mental Grid -->
+<section class="container" style="padding-bottom: 5rem;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem;">6 Jenis Gangguan Mental yang Didukung</h2>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+            Sistem kami dikonfigurasi berdasarkan basis pengetahuan pakar psikologi untuk mendiagnosa kategori gangguan di bawah ini:
+        </p>
+    </div>
+    
+    <div class="features-grid">
+        <!-- Skizofrenia -->
+        <div class="card feature-card">
+            <div class="feature-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                <i class="fa-solid fa-masks-theater"></i>
+            </div>
+            <h3 class="feature-title">Skizofrenia</h3>
+            <p class="feature-desc">
+                Gangguan mental berat yang memengaruhi cara berpikir, merasa, dan berperilaku secara realistis. Gejala khasnya meliputi halusinasi visual/pendengaran dan pola komunikasi yang kacau.
+            </p>
+        </div>
+
+        <!-- OCD -->
+        <div class="card feature-card">
+            <div class="feature-icon" style="background: rgba(168, 85, 247, 0.1); color: #c084fc;">
+                <i class="fa-solid fa-rotate-left"></i>
+            </div>
+            <h3 class="feature-title">Obsessive Compulsive Disorder</h3>
+            <p class="feature-desc">
+                Pikiran obsesif yang mengganggu secara berulang-ulang, mendorong penderita melakukan rutinitas atau tindakan kompulsif tertentu demi meredakan kecemasan berlebih.
+            </p>
+        </div>
+
+        <!-- Anorexia -->
+        <div class="card feature-card">
+            <div class="feature-icon" style="background: rgba(236, 72, 153, 0.1); color: var(--secondary);">
+                <i class="fa-solid fa-weight-scale"></i>
+            </div>
+            <h3 class="feature-title">Anorexia Nervosa</h3>
+            <p class="feature-desc">
+                Gangguan makan yang ditandai dengan pembatasan asupan kalori yang sangat ketat karena ketakutan yang tidak masuk akal terhadap penambahan berat badan.
+            </p>
+        </div>
+
+        <!-- Depresi -->
+        <div class="card feature-card">
+            <div class="feature-icon" style="background: rgba(244, 63, 94, 0.1); color: #fb7185;">
+                <i class="fa-solid fa-cloud-showers-heavy"></i>
+            </div>
+            <h3 class="feature-title">Depresi</h3>
+            <p class="feature-desc">
+                Gangguan suasana hati yang mendalam yang ditandai dengan hilangnya minat beraktivitas, rasa bersalah, insomnia parah, serta keputusasaan berkepanjangan.
+            </p>
+        </div>
+
+        <!-- Self Injuries -->
+        <div class="card feature-card">
+            <div class="feature-icon" style="background: rgba(239, 68, 68, 0.1); color: #f87171;">
+                <i class="fa-solid fa-band-aid"></i>
+            </div>
+            <h3 class="feature-title">Self Injuries (Melukai Diri)</h3>
+            <p class="feature-desc">
+                Kondisi psikologis di mana seseorang melukai tubuhnya sendiri secara sengaja sebagai jalan keluar maladaptif untuk melarikan diri dari ketegangan emosional.
+            </p>
+        </div>
+
+        <!-- Homoseksual -->
+        <div class="card feature-card">
+            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent);">
+                <i class="fa-solid fa-venus-mars"></i>
+            </div>
+            <h3 class="feature-title">Homoseksual</h3>
+            <p class="feature-desc">
+                Mengevaluasi tingkat kepastian kecenderungan orientasi seksual yang mengarah sepenuhnya ke sesama jenis, sesuai dengan parameter basis aturan yang telah terintegrasi dalam sistem.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Certainty Factor Explanation Section -->
+<section style="background: var(--bg-secondary); padding: 5rem 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <div class="container">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+            <div>
+                <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; line-height: 1.3;">Bagaimana Certainty Factor Membantu Diagnosa?</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.25rem;">
+                    Metode **Certainty Factor (CF)** digunakan untuk mengakomodasi ketidakpastian dalam pengambilan keputusan klinis. Dalam diagnosa gangguan mental, seorang pasien seringkali tidak yakin 100% apakah mereka merasakan gejala tertentu secara mutlak.
+                </p>
+                <p style="color: var(--text-secondary); margin-bottom: 1.25rem;">
+                    Metode ini mengombinasikan dua faktor kepercayaan:
+                </p>
+                <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <li><strong>Certainty Factor Pakar (CF Expert):</strong> Nilai keyakinan dari pakar psikologi mengenai hubungan suatu gejala dengan penyakit tertentu.</li>
+                    <li><strong>Certainty Factor Pengguna (CF User):</strong> Tingkat keyakinan subjektif yang Anda pilih saat menjawab daftar gejala.</li>
+                </ul>
+                <a href="{{ url_for('diagnose') }}" class="btn btn-primary">
+                    Mulai Konsultasi Mandiri <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="card" style="padding: 2.5rem;">
+                <h3 style="margin-bottom: 1rem; font-weight: 700;">Skala Keyakinan User</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">
+                    Saat mengisi form diagnosis, Anda akan diminta memilih salah satu dari 6 tingkat keyakinan berikut untuk setiap gejala:
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <span style="font-weight: 600;">Tidak Pasti</span>
+                        <span class="cf-badge cf-low">CF = 0.0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <span style="font-weight: 600;">Kurang Yakin</span>
+                        <span class="cf-badge cf-low">CF = 0.2</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <span style="font-weight: 600;">Cukup Yakin</span>
+                        <span class="cf-badge cf-medium">CF = 0.4</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <span style="font-weight: 600;">Yakin</span>
+                        <span class="cf-badge cf-medium">CF = 0.6</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <span style="font-weight: 600;">Sangat Yakin</span>
+                        <span class="cf-badge cf-high">CF = 0.8</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 0.5rem;">
+                        <span style="font-weight: 600; color: #fff;">Pasti</span>
+                        <span class="cf-badge cf-high" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">CF = 1.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
