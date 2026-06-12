@@ -20,7 +20,7 @@
                 <label for="nama" class="form-label">
                     <i class="fa-solid fa-user" style="color: var(--primary); margin-right: 0.5rem;"></i> Nama Lengkap / Inisial
                 </label>
-                <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama Anda (misal: Budi / Anonim)" required>
+                <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan nama Anda (misal: Budi / Anonim)" value="{{ session.get('nama', '') }}" required>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">
                     Identitas Anda dienkripsi secara lokal dan hanya digunakan untuk pencatatan riwayat konsultasi.
                 </p>

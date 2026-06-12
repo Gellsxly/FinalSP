@@ -88,119 +88,55 @@
                 </p>
                 
                 <!-- Rekomendasi/Saran -->
-                <div class="saran-box">
-                    <h4><i class="fa-solid fa-hand-holding-medical"></i> Rekomendasi Tindakan Pakar</h4>
-                    <p style="font-size: 1rem; line-height: 1.6; color: var(--text-primary);">
-                        {{ penyakit_info.saran }}
-                    </p>
+                <div class="saran-box" style="padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255, 255, 255, 0.01);">
+                    <h4 style="margin-top: 0; margin-bottom: 1.25rem; font-size: 1.2rem; color: #fff;"><i class="fa-solid fa-hand-holding-medical" style="color: var(--primary);"></i> Rekomendasi Tindakan Pakar</h4>
+                    
+                    {% set cf_pct = diagnosa.hasil_cf * 100 %}
+                    
+                    <!-- Kategori Status Keyakinan -->
+                    <div style="margin-bottom: 1.25rem; padding: 0.75rem 1rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem;
+                        {% if cf_pct < 60 %}
+                            background: rgba(234, 179, 8, 0.1); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.2);
+                        {% elif cf_pct < 80 %}
+                            background: rgba(249, 115, 22, 0.1); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.2);
+                        {% else %}
+                            background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2);
+                        {% endif %}">
+                        {% if cf_pct < 60 %}
+                            <i class="fa-solid fa-triangle-exclamation"></i> Kategori Kepastian: Rendah (&lt; 60%)
+                        {% elif cf_pct < 80 %}
+                            <i class="fa-solid fa-circle-exclamation"></i> Kategori Kepastian: Sedang (60% - 79%)
+                        {% else %}
+                            <i class="fa-solid fa-shield-halved"></i> Kategori Kepastian: Tinggi (&ge; 80%)
+                        {% endif %}
+                    </div>
+
+                    <!-- Rekomendasi Spesifik Penyakit -->
+                    <div style="background: rgba(99, 102, 241, 0.04); border-left: 4px solid var(--primary); padding: 1.25rem; border-radius: 0 8px 8px 0;">
+                        <h5 style="margin-top: 0; margin-bottom: 0.75rem; color: #fff; font-size: 1rem; font-weight: 600;">
+                            <i class="fa-solid fa-user-doctor" style="color: var(--primary); margin-right: 0.35rem;"></i>
+                            Saran Medis Spesifik untuk {{ penyakit_info.nama }} (Kepastian: {{ cf_pct | round(2) }}%)
+                        </h5>
+                        <p style="font-size: 0.95rem; line-height: 1.6; margin: 0; color: var(--text-primary);">
+                            {% if cf_pct < 60 %}
+                                {{ penyakit_info.saran.rendah }}
+                            {% elif cf_pct < 80 %}
+                                {{ penyakit_info.saran.sedang }}
+                            {% else %}
+                                {{ penyakit_info.saran.tinggi }}
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Rumus dan Langkah Perhitungan Detail -->
-            <div class="card steps-card">
-                <h3 class="result-section-title">
-                    <i class="fa-solid fa-calculator"></i> Transparansi Perhitungan Certainty Factor
-                </h3>
-                <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    Berikut adalah rincian perhitungan matematis menggunakan metode Certainty Factor untuk diagnosa gangguan <strong>{{ penyakit_info.nama }}</strong>:
-                </p>
 
-                {% set detail = rincian.langkah_detail[penyakit_info.kode] %}
-                
-                {% if detail and detail.he_steps %}
-                <div class="steps-list">
-                    <!-- Langkah 1: CF(H,E) -->
-                    <div class="step-item">
-                        <div class="step-title">
-                            <span>Langkah 1: Menghitung CF(H, E) untuk Gejala Terkait</span>
-                            <span class="step-badge">CF(H,E) = CF(User) * CF(Pakar)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                            Sistem mengalikan nilai kepastian yang Anda pilih dengan bobot kepastian pakar untuk gejala yang relevan:
-                        </p>
-                        <div class="table-container">
-                            <table class="custom-table" style="font-size: 0.85rem;">
-                                <thead>
-                                    <tr>
-                                        <th>Kode</th>
-                                        <th>Gejala Terdeteksi</th>
-                                        <th style="text-align: center;">CF User (Anda)</th>
-                                        <th style="text-align: center;">CF Pakar</th>
-                                        <th style="text-align: right;">CF(H, E)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for step in detail.he_steps %}
-                                    <tr>
-                                        <td><span class="symptom-code" style="font-size: 0.75rem;">{{ step.gejala_kode }}</span></td>
-                                        <td>{{ step.gejala_nama }}</td>
-                                        <td style="text-align: center;">{{ step.cf_user }}</td>
-                                        <td style="text-align: center;">{{ step.cf_expert }}</td>
-                                        <td style="text-align: right; font-weight: 700; color: #fff;">{{ step.cf_he }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Langkah 2: Kombinasi CF -->
-                    {% if detail.combine_steps %}
-                    <div class="step-item">
-                        <div class="step-title">
-                            <span>Langkah 2: Menggabungkan Nilai CF (Kombinasi)</span>
-                            <span class="step-badge">CF_combine = CF_old + CF_new * (1 - CF_old)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                            Sistem secara berurutan menggabungkan nilai-nilai $CF(H,E)$ yang didapatkan dari langkah pertama:
-                        </p>
-                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            {% for c_step in detail.combine_steps %}
-                            <div class="formula-box">
-                                <span class="formula-highlight">Kombinasi {{ loop.index }}:</span><br>
-                                $CF_{combine}({{ c_step.cf_old }}, {{ c_step.cf_new }}) = {{ c_step.cf_old }} + {{ c_step.cf_new }} \times (1 - {{ c_step.cf_old }})$<br>
-                                $= {{ c_step.cf_old }} + {{ c_step.cf_new }} \times {{ (1 - c_step.cf_old) | round(4) }}$<br>
-                                $= {{ c_step.cf_old }} + {{ (c_step.cf_new * (1 - c_step.cf_old)) | round(4) }}$<br>
-                                $= \mathbf{ {{(c_step.hasil)} } }$
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Kesimpulan Perhitungan -->
-                    <div class="step-item" style="border-bottom: none; padding-bottom: 0;">
-                        <div style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.15); padding: 1.25rem; border-radius: 0.75rem;">
-                            <span style="font-weight: 700; color: #fff; display: block; margin-bottom: 0.25rem;">Hasil Kepastian Akhir</span>
-                            <span style="color: var(--text-secondary); font-size: 0.95rem;">
-                                Nilai CF akhir untuk <strong>{{ penyakit_info.nama }}</strong> adalah <strong>{{ detail.cf_final }}</strong>. 
-                                Dikonversi ke persentase keyakinan pakar: <strong>{{ (detail.cf_final * 100) | round(2) }}%</strong>.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <p style="color: var(--text-muted); font-style: italic;">
-                    Tidak ada gejala yang relevan yang diisi dengan keyakinan di atas "Tidak Pasti" untuk penyakit ini, sehingga nilai kepastian akhir adalah 0.0.
-                </p>
-                {% endif %}
-            </div>
         </div>
 
         <!-- Right Column: Visualization Chart & Action List -->
         <div>
-            <!-- Visualisasi Chart.js -->
-            <div class="chart-card" style="margin-bottom: 2rem;">
-                <h3 class="result-section-title" style="margin-bottom: 1.5rem;">
-                    <i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Perbandingan CF
-                </h3>
-                <div class="chart-wrapper">
-                    <canvas id="cfChart"></canvas>
-                </div>
-            </div>
-
             <!-- Riwayat Singkat / Navigasi Aksi -->
-            <div class="card no-print">
+            <div class="card no-print" style="margin-bottom: 2rem;">
                 <h3 class="result-section-title" style="margin-bottom: 1.25rem;">
                     <i class="fa-solid fa-gears" style="color: var(--text-secondary);"></i> Navigasi Hasil
                 </h3>
@@ -214,6 +150,16 @@
                     <a href="{{ url_for('history') }}" class="btn btn-secondary" style="width: 100%;">
                         <i class="fa-solid fa-clock-rotate-left"></i> Lihat Riwayat Lengkap
                     </a>
+                </div>
+            </div>
+
+            <!-- Visualisasi Chart.js -->
+            <div class="chart-card" style="height: auto;">
+                <h3 class="result-section-title" style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-chart-simple" style="color: var(--primary);"></i> Perbandingan CF
+                </h3>
+                <div class="chart-wrapper" style="height: 250px;">
+                    <canvas id="cfChart"></canvas>
                 </div>
             </div>
         </div>
@@ -231,20 +177,20 @@
     const values = [];
     
     {% for label, val in rincian.cf_values.items() %}
-        labels.push("{{ label }}");
+        labels.push("{{ label }}" === "Obsessive Compulsive Disorder (OCD)" ? "OCD" : "{{ label }}");
         values.push({{ val * 100 }}); // Convert to percentage
     {% endfor %}
 
     // Generate bar colors dynamically
     const barColors = labels.map(label => {
-        if (label === "{{ penyakit_info.nama }}") {
+        if (label === "{{ penyakit_info.nama }}" || (label === "OCD" && "{{ penyakit_info.nama }}" === "Obsessive Compulsive Disorder (OCD)")) {
             return 'rgba(236, 72, 153, 0.85)'; // Pink/Rose for the diagnosed illness
         }
         return 'rgba(99, 102, 241, 0.4)'; // Indigo for others
     });
 
     const borderColors = labels.map(label => {
-        if (label === "{{ penyakit_info.nama }}") {
+        if (label === "{{ penyakit_info.nama }}" || (label === "OCD" && "{{ penyakit_info.nama }}" === "Obsessive Compulsive Disorder (OCD)")) {
             return 'rgba(236, 72, 153, 1)';
         }
         return 'rgba(99, 102, 241, 0.8)';
@@ -265,8 +211,15 @@
             }]
         },
         options: {
+            indexAxis: 'y', // Mengubah grafik menjadi horizontal
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 20
+                }
+            },
             plugins: {
                 legend: {
                     display: false // Hide legend as there's only 1 dataset
@@ -274,13 +227,13 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return ` ${context.parsed.y.toFixed(2)}%`;
+                            return ` ${context.parsed.x.toFixed(2)}%`; // Menggunakan parsed.x untuk horizontal
                         }
                     }
                 }
             },
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
                     max: 100,
                     grid: {
@@ -296,7 +249,7 @@
                         }
                     }
                 },
-                x: {
+                y: {
                     grid: {
                         display: false
                     },

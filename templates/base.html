@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,35 +11,110 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Identity Services (GIS) library for Google Login -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* Prevent brand text from wrapping */
+        .brand {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+
+        .user-profile-badge {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.45rem 0.9rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+        
+        .user-profile-badge:hover {
+            background: rgba(99, 102, 241, 0.18);
+            border-color: rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-logout {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.9rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.4);
+            transform: translateY(-1px);
+        }
+    </style>
+
+    {% if session.get('user_id') %}
+    <style>
+        /* Compact navbar spacing when logged in */
+        .nav-links {
+            gap: 0.85rem !important;
+        }
+
+        .nav-link {
+            padding: 0.4rem 0.65rem !important;
+            font-size: 0.9rem !important;
+            white-space: nowrap !important;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+            white-space: nowrap !important;
+        }
+    </style>
+    {% endif %}
 </head>
+
 <body>
 
     <!-- Flash Messages -->
     <div class="alert-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" id="alert-{{ loop.index }}">
-                        {% if category == 'success' %}
-                            <i class="fa-solid fa-circle-check"></i>
-                        {% else %}
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        {% endif %}
-                        <span>{{ message }}</span>
-                    </div>
-                    <script>
-                        setTimeout(() => {
-                            const alertEl = document.getElementById('alert-{{ loop.index }}');
-                            if (alertEl) {
-                                alertEl.style.opacity = '0';
-                                alertEl.style.transform = 'translateX(100px)';
-                                alertEl.style.transition = 'all 0.5s ease';
-                                setTimeout(() => alertEl.remove(), 500);
-                            }
-                        }, 4000);
-                    </script>
-                {% endfor %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" id="alert-{{ loop.index }}">
+            {% if category == 'success' %}
+            <i class="fa-solid fa-circle-check"></i>
+            {% else %}
+            <i class="fa-solid fa-triangle-exclamation"></i>
             {% endif %}
+            <span>{{ message }}</span>
+        </div>
+        <script>
+            setTimeout(() => {
+                const alertEl = document.getElementById('alert-{{ loop.index }}');
+                if (alertEl) {
+                    alertEl.style.opacity = '0';
+                    alertEl.style.transform = 'translateX(100px)';
+                    alertEl.style.transition = 'all 0.5s ease';
+                    setTimeout(() => alertEl.remove(), 500);
+                }
+            }, 4000);
+        </script>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
     </div>
 
@@ -52,26 +128,65 @@
                 <span>MindCare CF</span>
             </a>
             <ul class="nav-links">
+                {% if session.get('role') != 'admin' %}
                 <li>
                     <a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">
                         <i class="fa-solid fa-house"></i> Beranda
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('rules') }}" class="nav-link {% if request.path == '/rules' %}active{% endif %}">
+                    <a href="{{ url_for('rules') }}"
+                        class="nav-link {% if request.path == '/rules' %}active{% endif %}">
                         <i class="fa-solid fa-book-medical"></i> Rule Base
                     </a>
                 </li>
+                {% endif %}
+
+                {% if session.get('user_id') %}
+                {% if session.get('role') != 'admin' %}
                 <li>
-                    <a href="{{ url_for('history') }}" class="nav-link {% if request.path == '/history' %}active{% endif %}">
+                    <a href="{{ url_for('history') }}"
+                        class="nav-link {% if request.path == '/history' %}active{% endif %}">
                         <i class="fa-solid fa-clock-rotate-left"></i> Riwayat
+                    </a>
+                </li>
+                {% endif %}
+                {% if session.get('role') == 'admin' %}
+                <li>
+                    <a href="{{ url_for('admin_dashboard') }}"
+                        class="nav-link {% if request.path == '/admin' %}active{% endif %}" style="color: #fda4af;">
+                        <i class="fa-solid fa-user-shield"></i> Admin Panel
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <span class="user-profile-badge">
+                        <i class="fa-solid fa-user-check" style="color: var(--primary);"></i>
+                        <span style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">{{ session.get('nama') }}</span>
+                    </span>
+                </li>
+                <li>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
                     </a>
                 </li>
                 <li>
                     <a href="{{ url_for('diagnose') }}" class="btn btn-primary nav-btn">
-                        <i class="fa-solid fa-stethoscope"></i> Mulai Diagnosa
+                        <i class="fa-solid fa-stethoscope"></i> Diagnosa
                     </a>
                 </li>
+                {% else %}
+                <li style="margin-left: 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <a href="{{ url_for('login') }}"
+                        class="nav-link {% if request.path == '/login' %}active{% endif %}">
+                        Masuk
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary"
+                        style="padding: 0.5rem 1.25rem; font-size: 0.9rem; border-radius: 0.5rem;">
+                        Daftar
+                    </a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </header>
@@ -87,11 +202,14 @@
             <a href="{{ url_for('index') }}" class="footer-logo">
                 <i class="fa-solid fa-brain" style="color: var(--primary);"></i> MindCare CF
             </a>
-            <p style="margin-bottom: 0.5rem;">Sistem Pakar Mendiagnosa Gangguan Mental pada Diri Seseorang Menggunakan Metode Certainty Factor</p>
-            <p>&copy; 2026. Dibuat dengan <i class="fa-solid fa-heart" style="color: var(--secondary);"></i> untuk Kesehatan Mental yang Lebih Baik.</p>
+            <p style="margin-bottom: 0.5rem;">Sistem Pakar Mendiagnosa Gangguan Mental pada Diri Seseorang Menggunakan
+                Metode Certainty Factor</p>
+            <p>&copy; 2026. Dibuat dengan <i class="fa-solid fa-heart" style="color: var(--secondary);"></i> untuk
+                Kesehatan Mental yang Lebih Baik.</p>
         </div>
     </footer>
 
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

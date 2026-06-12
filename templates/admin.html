@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Administrator | MindCare CF{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+    
+    <!-- Header -->
+    <div style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.25rem;">Panel Administrator</h1>
+            <p style="color: var(--text-secondary);">Pantau data pengguna, riwayat diagnosis, dan performa sistem Certainty Factor secara realtime.</p>
+        </div>
+        <span style="background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; font-size: 0.9rem;">
+            <i class="fa-solid fa-user-shield"></i> Hak Akses Admin
+        </span>
+    </div>
+
+    <!-- Stats Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        <!-- Card 1: Total Users -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem 2rem;">
+            <div style="font-size: 2.5rem; color: var(--primary); background: rgba(99, 102, 241, 0.1); width: 4.5rem; height: 4.5rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(99, 102, 241, 0.15);">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Total Pengguna</p>
+                <h2 style="margin: 0; font-size: 2rem; font-weight: 800; color: #fff;">{{ stats.total_users }}</h2>
+            </div>
+        </div>
+
+        <!-- Card 2: Total Diagnoses -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem 2rem;">
+            <div style="font-size: 2.5rem; color: var(--secondary); background: rgba(236, 72, 153, 0.1); width: 4.5rem; height: 4.5rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(236, 72, 153, 0.15);">
+                <i class="fa-solid fa-stethoscope"></i>
+            </div>
+            <div>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Total Diagnosa</p>
+                <h2 style="margin: 0; font-size: 2rem; font-weight: 800; color: #fff;">{{ stats.total_diagnoses }}</h2>
+            </div>
+        </div>
+
+        <!-- Card 3: Top Disease -->
+        <div class="card" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem 2rem;">
+            <div style="font-size: 2.5rem; color: var(--accent); background: rgba(16, 185, 129, 0.1); width: 4.5rem; height: 4.5rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.15);">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <div>
+                <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Gangguan Terbanyak</p>
+                <h2 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #fff; line-height: 1.2; margin-top: 0.25rem;">
+                    {% if stats.diagnose_stats %}
+                        {{ stats.diagnose_stats[0].hasil_penyakit }} <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-secondary);">({{ stats.diagnose_stats[0].count }}x)</span>
+                    {% else %}
+                        Belum Ada Data
+                    {% endif %}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Content Tabs -->
+    <div class="card" style="padding: 2.5rem;">
+        <!-- Tab Navigation Buttons -->
+        <div style="display: flex; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 2rem;">
+            <button onclick="switchTab('tab-users')" id="btn-tab-users" class="btn btn-primary" style="font-size: 0.95rem; border-radius: 0.5rem; padding: 0.6rem 1.25rem;">
+                <i class="fa-solid fa-users"></i> Daftar Pengguna
+            </button>
+            <button onclick="switchTab('tab-diagnoses')" id="btn-tab-diagnoses" class="btn btn-secondary" style="font-size: 0.95rem; border-radius: 0.5rem; padding: 0.6rem 1.25rem;">
+                <i class="fa-solid fa-clipboard-list"></i> Semua Riwayat Diagnosa
+            </button>
+        </div>
+
+        <!-- Tab 1: Users Table -->
+        <div id="tab-users" class="admin-tab">
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">Manajemen Pengguna</h3>
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px; text-align: center;">ID</th>
+                            <th>Nama Lengkap</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Tanggal Registrasi</th>
+                            <th style="text-align: center;">Jumlah Diagnosa</th>
+                            <th style="text-align: right; width: 150px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">{{ user.id }}</td>
+                            <td style="font-weight: 700; color: #fff;">
+                                {{ user.nama }}
+                                {% if user.role == 'admin' %}
+                                    <span style="font-size: 0.75rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.35rem;">ADMIN</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td><span style="text-transform: capitalize;">{{ user.role }}</span></td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '-' }}</td>
+                            <td style="text-align: center; font-family: monospace; font-weight: 700;">{{ user.total_diagnosa }}</td>
+                            <td style="text-align: right;">
+                                {% if user.role != 'admin' %}
+                                <form action="{{ url_for('admin_delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini beserta semua riwayat diagnosanya? Tindakan ini permanen!');" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                        <i class="fa-solid fa-user-xmark"></i> Hapus
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">Protected</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Diagnoses Table -->
+        <div id="tab-diagnoses" class="admin-tab" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin: 0;">Seluruh Riwayat Diagnosis</h3>
+                {% if diagnoses %}
+                <form action="{{ url_for('clear_history') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus semua riwayat diagnosa sistem secara permanen?');">
+                    <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                        <i class="fa-solid fa-trash-can"></i> Bersihkan Semua Riwayat Sistem
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            
+            {% if diagnoses %}
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px; text-align: center;">ID</th>
+                            <th>Akun Pengguna</th>
+                            <th>Nama Pasien</th>
+                            <th>Tanggal Diagnosa</th>
+                            <th>Hasil Diagnosa</th>
+                            <th style="text-align: center;">Tingkat CF</th>
+                            <th style="text-align: right; width: 200px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for diagnose in diagnoses %}
+                        <tr>
+                            <td style="text-align: center; font-weight: 700; color: var(--text-secondary);">{{ diagnose.id }}</td>
+                            <td style="font-weight: 600;">{{ diagnose.user_email if diagnose.user_email else 'Anonim / Terhapus' }}</td>
+                            <td style="font-weight: 700; color: #fff;">{{ diagnose.nama_pasien }}</td>
+                            <td>{{ diagnose.tanggal }}</td>
+                            <td><span style="font-weight: 600; color: var(--secondary);">{{ diagnose.hasil_penyakit }}</span></td>
+                            <td style="text-align: center; font-weight: 700; color: #fff;">{{ (diagnose.hasil_cf * 100) | round(2) }}%</td>
+                            <td style="text-align: right;">
+                                <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                                    <a href="{{ url_for('result', result_id=diagnose.id) }}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                        <i class="fa-solid fa-eye"></i> Detail
+                                    </a>
+                                    <form action="{{ url_for('delete_history', result_id=diagnose.id) }}" method="POST" onsubmit="return confirm('Hapus diagnosa ini dari database?');" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; background: #3b141a; border: 1px solid #7c2d12; color: #f87171;">
+                                            <i class="fa-solid fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 4rem 0; color: var(--text-muted);">
+                <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p>Belum ada diagnosa yang dilakukan oleh pengguna.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function switchTab(tabId) {
+        // Hide all tabs
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.style.display = 'none';
+        });
+        
+        // Show target tab
+        document.getElementById(tabId).style.display = 'block';
+        
+        // Update button active states
+        const btnUsers = document.getElementById('btn-tab-users');
+        const btnDiagnoses = document.getElementById('btn-tab-diagnoses');
+        
+        if (tabId === 'tab-users') {
+            btnUsers.className = 'btn btn-primary';
+            btnDiagnoses.className = 'btn btn-secondary';
+        } else {
+            btnUsers.className = 'btn btn-secondary';
+            btnDiagnoses.className = 'btn btn-primary';
+        }
+    }
+</script>
+{% endblock %}
